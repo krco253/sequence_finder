@@ -17,15 +17,29 @@ IndexedFragment frag13(pair13, genome);
 ContextFragment context1(frag0, frag1, frag2);
 ContextFragment context2(frag2, frag01, frag02);
 ContextFragment context3(frag01, frag02, frag13);
-FragmentLibrary test_vector;
-test_vector.add_substring(context1);
-test_vector.add_substring(context2);
-test_vector.add_substring(context3);
-std::cout << genome << std::endl;
+FragmentLibrary test_library;
+//std::pair<unsigned,unsigned> flattened = context3.flatten();
+//std::cout << context3 << std::endl;
+//std::cout << flattened.first << " " << flattened.second << std::endl;
+std::pair<unsigned, unsigned> indices0;
+std::pair<unsigned, unsigned> indices1;
+std::pair<unsigned, unsigned> indices2;
+indices0 = context1.flatten();
+indices1 = context2.flatten();
+indices2 = context3.flatten();
+test_library.insert(indices0, context1);
+test_library.insert(indices1, context2);
+test_library.insert(indices2, context3);
+//ContextFragment first;
+//first = (*(test_library.begin())).second;
+// std::cout << first << std::endl;
+//std::cout << genome << std::endl;
+
 std::cout << "Before consolidation: " << std::endl;
-test_vector.annotated_print();
-test_vector.consolidate_sequences(genome);
+test_library.annotated_print();
+test_library.consolidate_sequences(genome);
 std::cout << "After consolidation: " << std::endl;
-test_vector.annotated_print();
+test_library.annotated_print();
+
 return 0;
 }

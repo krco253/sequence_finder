@@ -22,7 +22,7 @@ class ContextFragment
 		//check if a contextfragment is empty
 		bool isEmpty();
 		//"flatten" the ContextFragment into one IndexedFragment
-		IndexedFragment flatten(Dna5String &whole_sequence);
+		std::pair<unsigned,unsigned> flatten();
 		//combine fragments, conserving the query sequences
 		ContextFragment consolidate_frags(const ContextFragment &other, Dna5String &sequence);
 		//return the requested index of the query_seq

@@ -52,13 +52,12 @@ bool ContextFragment::isEmpty()
 /*---------------------------------------------
 | flatten()
 ------------------------------------------------*/
-IndexedFragment ContextFragment::flatten(Dna5String &whole_sequence)
+std::pair<unsigned, unsigned> ContextFragment::flatten()
 {
 	std::pair<unsigned,unsigned> flattened_indices;
 	flattened_indices.first = ((this->prefix_seq).indices).first; 
 	flattened_indices.second = ((this->suffix_seq).indices).second;
-	IndexedFragment flat(flattened_indices, whole_sequence);
-	return flat;
+	return flattened_indices;
 }
 /*---------------------------------------------
 | consolidate_frags()

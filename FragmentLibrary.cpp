@@ -14,11 +14,6 @@ FragmentLibrary::FragmentLibrary()
 	
 }
 
-FragmentLibrary::FragmentLibrary(std::list<ContextFragment> &substrings, ContextFragment &new_frag)
-{
-	substrings.push_back(new_frag);
-} 
-
 FragmentLibrary::FragmentLibrary(const FragmentLibrary &copy)
 {
 	this->context_substrings= copy.context_substrings;
@@ -32,10 +27,10 @@ FragmentLibrary::~FragmentLibrary() { }
 ------------------------------------------------*/
 void FragmentLibrary::annotated_print()
 {
-	std::list<ContextFragment>::iterator it; 
+	std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator it; 
 	for(it = (this->context_substrings).begin(); it != (this->context_substrings).end(); it++)
 	{
-		it->print_query();
+		(it->second).print_query();
 	}
 }
 
@@ -51,24 +46,27 @@ bool FragmentLibrary::empty()
 	else 
 		return false;	
 }
-
+/*---------------------------------------------
+| begin()
+------------------------------------------------*/
+std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator FragmentLibrary::begin()
+{
+	return (this->context_substrings).begin();
+}
+ /*---------------------------------------------
+| insert
+------------------------------------------------*/
+void FragmentLibrary::insert(std::pair<unsigned,unsigned> &fragment_key, ContextFragment fragment_object)
+{
+	(this->context_substrings).insert(std::make_pair(fragment_key, fragment_object));
+}
 /*---------------------------------------------
 | erase_substring
------------------------------------------------*/
-std::list<ContextFragment>::iterator FragmentLibrary::erase_substring(std::list<ContextFragment>::iterator &index)
-{
-	auto next = std::next(index,1);
-	(this->context_substrings).erase(index);
-	return next;
-}
-
-/*---------------------------------------------
-| add_substring
 ------------------------------------------------*/
 
-void FragmentLibrary::add_substring(const ContextFragment &new_frag)
+void FragmentLibrary::erase_substring(std::pair<unsigned, unsigned> &fragment_key)
 {
-	(this->context_substrings).push_back(new_frag);
+	(this->context_substrings).erase(fragment_key);
 }
 
 /*---------------------------------------------
@@ -76,46 +74,55 @@ void FragmentLibrary::add_substring(const ContextFragment &new_frag)
 ------------------------------------------------*/
 void FragmentLibrary::consolidate_sequences(Dna5String &context_sequence)
 {
-	std::list<ContextFragment>::iterator it = (this->context_substrings).begin();
-	std::list<ContextFragment>::iterator last =(this->context_substrings).end(); 
-	auto nx = std::next(it,1);
-
-	while  (nx != last)
+	std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator last = (this->context_substrings).end(); 
+	last--;
+	std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator it=(this->context_substrings).begin();	
+	while(it != last)	
 	{
-		if (((*nx).get_index(1,0) <= (*it).get_index(1,0)) && ((*it).get_index(1,0) <= (*nx).get_index(2,2)) && ((*nx).get_index(2,2) <= (*it).get_index(2,2)))
-		{
-			ContextFragment temp;
-			temp = it->consolidate_frags((*nx), context_sequence);
-			this->add_substring(temp);
-			it = this->erase_substring(it);
-			nx = this->erase_substring(nx);
+		std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator nx = std::next(it, 1);
+
+		if (it->second == nx->second)
+		{	
+			it = last;
+			break;
 		}
-		else if(((*it).get_index(1,0) <= (*nx).get_index(1,0)) && ((*nx).get_index(1,0) <= (*it).get_index(2,2)) && ((*it).get_index(2,2) <= (*nx).get_index(2,2)))
+		else if ((((nx)->second).get_index(1,0) <= ((it)->second).get_index(1,0)) && (((it)->second).get_index(1,0) <= ((nx)->second).get_index(2,2)) && (((nx)->second).get_index(2,2) <= ((it)->second).get_index(2,2)))
 		{
 			ContextFragment temp;
-			temp = it->consolidate_frags((*nx), context_sequence);
-			this->add_substring(temp);
-			it = this->erase_substring(it);
-			nx = this->erase_substring(nx);
+			temp = (it->second).consolidate_frags((nx)->second, context_sequence);
+			std::pair<unsigned, unsigned> temp_indices;
+			std::pair<unsigned, unsigned> this_indices;
+			std::pair<unsigned, unsigned> nx_indices;
+			temp_indices = temp.flatten();
+			this_indices = ((it)->second).flatten();
+			nx_indices = ((nx)->second).flatten();
+			this->erase_substring(this_indices);
+			this->erase_substring(nx_indices);	
+			this->insert(temp_indices, temp);
+			it =  (this->context_substrings).find(temp_indices);
+		}
+		else if ((((it)->second).get_index(1,0) <= ((nx)->second).get_index(1,0)) && (((nx)->second).get_index(1,0) <= ((it)->second).get_index(2,2)) && (((it)->second).get_index(2,2) <= ((nx)->second).get_index(2,2)))
+		{
+			ContextFragment temp;
+			temp = (it->second).consolidate_frags((nx)->second, context_sequence);
+			std::pair<unsigned, unsigned> temp_indices;
+			std::pair<unsigned, unsigned> this_indices;
+			std::pair<unsigned, unsigned> nx_indices;
+			temp_indices = temp.flatten();
+			this_indices = ((it)->second).flatten();
+			nx_indices = ((nx)->second).flatten();
+			this->erase_substring(this_indices);
+			this->erase_substring(nx_indices);
+			this->insert(temp_indices, temp);
+			it = (this->context_substrings).find(temp_indices);
 		}
 		else
-		{
 			it++;
-			nx++;
-		}
-			
-	}
+		
 	
+	} 
 }
 
-/*---------------------------------------------
-| sort_by_index
-------------------------------------------------*/
-
-void FragmentLibrary::sort_by_index()
-{
-	(this->context_substrings).sort();	
-}
 /*----------------------------------------------
 |	size()
 ------------------------------------------------*/
@@ -124,6 +131,7 @@ unsigned FragmentLibrary::size()
 	unsigned size = (this->context_substrings).size();
 	return size;
 }
+
 /*---------------------------------------------
 | Overloaded Operators
 ------------------------------------------------*/
@@ -135,9 +143,12 @@ FragmentLibrary FragmentLibrary::operator=(const FragmentLibrary& other)
 
 std::ostream& operator<<(std::ostream& os, const FragmentLibrary& sub_vec)
 {
-	for(std::list<ContextFragment>::const_iterator it = (sub_vec.context_substrings).begin(); it != (sub_vec.context_substrings).end(); it++)
+	std::map<std::pair<unsigned,unsigned>, ContextFragment>::const_iterator it = (sub_vec.context_substrings).begin();
+	std::map<std::pair<unsigned,unsigned>, ContextFragment>::const_iterator last = (sub_vec.context_substrings).end();
+	while(it != last)
 	{
-		os << *it << std::endl; 
+		os << it->second << std::endl; 
+		it++;
 	}	
 	return os;
 }

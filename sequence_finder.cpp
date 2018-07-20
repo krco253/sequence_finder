@@ -155,32 +155,41 @@ int main(int argc, char const ** argv)
 				std::pair<unsigned, unsigned> q_point(point, point+length(needle));
 				std::pair<unsigned, unsigned> pre_point(point-41,point);
 				std::pair<unsigned, unsigned> suff_point(point+length(needle), point+length(needle)+41);
+				std::pair<unsigned,unsigned> whole_frag(point-41, point+length(needle)+41);
+
 				IndexedFragment temp_ind_frag1(q_point, whole_seq);
 				IndexedFragment temp_ind_frag0(pre_point, whole_seq);
 				IndexedFragment temp_ind_frag2(suff_point, whole_seq);
-				ContextFragment temp_cont(temp_ind_frag0, temp_ind_frag1, temp_ind_frag2);			
-				hits.add_substring(temp_cont);
+				ContextFragment temp_cont(temp_ind_frag0, temp_ind_frag1, temp_ind_frag2);
+							
+				hits.insert(whole_frag, temp_cont);
 			}
 			else if((point <= 40) && (point+length(needle)+81 != length(whole_seq)))
 			{
 				std::pair<unsigned, unsigned> q_point(point, point+length(needle));
 				std::pair<unsigned, unsigned> suff_point(point+length(needle), point+length(needle)+81);
+				std::pair<unsigned,unsigned> whole_frag(point, point+length(needle)+81);
+
 				IndexedFragment temp_ind_frag1(q_point, whole_seq);
 				IndexedFragment temp_ind_frag2(suff_point, whole_seq);
 				IndexedFragment temp_ind_frag0;
 				ContextFragment temp_cont(temp_ind_frag0, temp_ind_frag1, temp_ind_frag2);			
-				hits.add_substring(temp_cont);
+
+				hits.insert(whole_frag, temp_cont);
 				
 			} 
 			else if(point >= 80)
 			{
 				std::pair<unsigned, unsigned> q_point(point, point+length(needle));
 				std::pair<unsigned, unsigned> pre_point(point-81, point);
+				std::pair<unsigned,unsigned> whole_frag(point-81, point+length(needle));
+			
 				IndexedFragment temp_ind_frag1(q_point, whole_seq);
 				IndexedFragment temp_ind_frag0(pre_point, whole_seq);
 				IndexedFragment temp_ind_frag2;
 				ContextFragment temp_cont(temp_ind_frag0, temp_ind_frag1, temp_ind_frag2);			
-				hits.add_substring(temp_cont);
+			
+				hits.insert(whole_frag, temp_cont);
 	
 			}
 			else
@@ -190,7 +199,7 @@ int main(int argc, char const ** argv)
 				IndexedFragment temp_ind_frag1(q_point, whole_seq);
 				IndexedFragment temp_ind_frag0, temp_ind_frag2;
 				ContextFragment temp_cont(temp_ind_frag0, temp_ind_frag1, temp_ind_frag2);			
-				hits.add_substring(temp_cont);
+				hits.insert(q_point, temp_cont);
 
 			}
 		}
@@ -265,20 +274,19 @@ int main(int argc, char const ** argv)
 	
 	hits.annotated_print();	
 
-//	hits.consolidate_sequences(whole_seq);
+	hits.consolidate_sequences(whole_seq);
 
 	//Prepare hits for printing	
 	
-//	if(!isSet(parser, "minimum_match"))
-//		min_match = 1;
+	if(!isSet(parser, "minimum_match"))
+		min_match = 1;
 
 	//Print hits
-//	hits.sort_by_index();
 	std::cout << std::endl;
-//
+
 	hits.annotated_print();	
 
-//	std::cout << "There were " << hits.size() << " consolidated hits" << std::endl;
+	std::cout << "There were " << hits.size() << " consolidated hits" << std::endl;
 
 	return 0;	
 }
