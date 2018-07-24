@@ -7,7 +7,6 @@
 
 #include <utility> //pair
 #include <iostream> //cout 
-#include <aio.h> //for asynchrous search
 #include <iterator>
 #include <stdlib.h>
 
@@ -19,7 +18,9 @@
 
 using namespace seqan;
 
-typedef Infix<Dna5String>::Type SString; //a type that creates pointers to subsequences of Dna5Strings
+typedef Infix<Dna5String>::Type SString; //a type that stores subsequences of Dna5Strings
+typedef std::pair <SString, SString> SStringPair; //a pair of SStrings
+typedef std::pair <SString, SStringPair> ContextPair; //a pair of a SString and SStringPair, later used to store a match and its context
 
 class IndexedFragment
 {

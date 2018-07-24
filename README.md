@@ -9,21 +9,25 @@ sequence_finder is a C++ project that utilizes the Seqan template library to fin
 ### Prerequisites
 - Can only be used on Linux OS
 - To use sequence_finder, Seqan 2.4.0 is required. For instructions on how to download the Seqan library, visit: https://seqan.readthedocs.io/en/seqan-v2.4.0/Infrastructure/Use/CustomBuildSystem.html 
-
-### Installing
+- Make is used to compile source code. Make can be obtained with the following command:
+```
+sudo apt get make
+```
+2### Installing
 
 1. Download this repository:
 ```
 git clone https://github.com/krco253/sequence_finder.git
 ```
-2. Compile with gcc, with the following flags:  
+2. Navigate to sequence_finder directory and edit the flags in the makefile to reflect the location of Seqan on your machine:  
 ```
-g++ -isystem <path/to/seqan>
--std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp
--lpthread -ggdb -o sequence_finder sequence_finder.cpp FragmentLibrary.cpp ContextFragment.cpp IndexedFragment.cpp -lrt 
--Wno-unused-parameter -Wno-sequence-point
+FLAGS = -isystem <path/to/seqan> -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp -lpthread -pthread -ggdb -Wno-unused-parameter -Wno-sequence-point
 ```
-3. View sequence_finder help page like so: 
+3. Inside of the sequence_finder folder, run make
+```
+make
+```
+4. View sequence_finder help page like so: 
 ```
 ./sequence_finder -h
 ```

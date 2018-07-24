@@ -18,24 +18,17 @@ TODO: -line up query column
 #include <seqan/file.h> 
 #include <seqan/seq_io.h> //reading input files/writing input files
 #include "FragmentLibrary.h" //to store and process results
-#include <aio.h> //asynchronous search
-
-using namespace seqan;
-
+#include <aio.h> //for asynchronous search
 #define ENABLE_SEQAN_DEBUG = 1 //enable debugging
 
-typedef Infix<Dna5String>::Type SString; //a type that stores subsequences of Dna5Strings
-typedef std::pair <SString, SString> SStringPair; //a pair of SStrings
-typedef std::pair <SString, SStringPair> ContextPair; //a pair of a SString and SStringPair, later used to store a match and its context
-
 /*--------------------------------------------------------------
-| Function: find_MoTERs
+| Function: find_MoTeRs
 | Input: Empty StringSets 
 | "Returns": The essential MoTER sequences and extended sequences 
 | to search for
 ---------------------------------------------------------------*/
 
-void find_MoTERs(StringSet<Dna5String> &moter_patterns_central, StringSet<Dna5String> &moter_patterns_extended)
+void find_MoTeRs(StringSet<Dna5String> &moter_patterns_central, StringSet<Dna5String> &moter_patterns_extended)
 {
 	//moter_patterns_central represents "essential" MoTER sequences
 	//moter_patterns_extended represents "extended" sequences to search for
@@ -252,7 +245,7 @@ int main(int argc, char const ** argv)
 		std::cout << "Beginning search for MoTER relics" << std::endl;
 		StringSet<Dna5String> essential_seqs;
 		StringSet<Dna5String> extended_seqs;
-		find_MoTERs(essential_seqs, extended_seqs);
+		find_MoTeRs(essential_seqs, extended_seqs);
 		std::cout << "Searching for essential hits. . ." << std::endl;
 		//Seqan's built-in Optimal Search Scheme algorithm
 		find<0,1>(delegateParallel, index, essential_seqs, EditDistance());
