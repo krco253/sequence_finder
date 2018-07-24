@@ -11,7 +11,7 @@ sequence_finder is a C++ project that utilizes the Seqan template library to fin
 - To use sequence_finder, Seqan 2.4.0 is required. For instructions on how to download the Seqan library, visit: https://seqan.readthedocs.io/en/seqan-v2.4.0/Infrastructure/Use/CustomBuildSystem.html 
 - Make is used to compile source code. Make can be obtained with the following command:
 ```
-sudo apt get make
+sudo apt install make
 ```
 ### Installing
 
