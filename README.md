@@ -21,6 +21,23 @@ git clone https://github.com/krco253/sequence_finder.git
 -lpthread -ggdb -o sequence_finder sequence_finder.cpp FragmentLibrary.cpp ContextFragment.cpp IndexedFragment.cpp -lrt 
 -Wno-unused-parameter -Wno-sequence-point
 
+3. View sequence_finder help page like so: 
+```
+./sequence_finder -h
+```
+
+### Usage
+1. This program must be given the path to a .fasta file to search in order to work.
+2. By default, this program looks for MoTeR relics and the surrounding sequence. To use the program in its default state: 
+```
+./sequence_finder -s <path/to/your/FASTA/file>
+```
+3. To use this program to search for a short string: 
+```
+./sequence_finder -s <path/to/your/FASTA/file> -t <"your DNA string"> -e <max number of errors>
+```
+This program only supports up to 4 errors.
+4. For other commands, check out the help page.
 
 ## Authors
 
