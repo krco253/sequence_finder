@@ -1,5 +1,5 @@
 CC = /usr/bin/g++ #path to g++
-FLAGS = -isystem ~/devel/seqan/include -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp -lpthread -pthread -ggdb -Wno-unused-parameter -Wno-sequence-point #flags necessary to use Seqan and its particular implementation in this source code
+FLAGS = -isystem <path/to/seqan/here> -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp -lpthread -pthread -ggdb -Wno-unused-parameter -Wno-sequence-point #flags necessary to use Seqan and its particular implementation in this source code
 SOURCES = sequence_finder.cpp FragmentLibrary.cpp ContextFragment.cpp IndexedFragment.cpp #source files
 EXE = sequence_finder #executable name
 OBJS = $(SOURCES:.cpp = .o)

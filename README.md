@@ -21,7 +21,7 @@ git clone https://github.com/krco253/sequence_finder.git
 ```
 2. Navigate to sequence_finder directory and edit the FLAGS macro in the makefile to reflect the location of Seqan on your machine:  
 ```
-FLAGS = -isystem <path/to/seqan> -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp -lpthread -pthread -ggdb -Wno-unused-parameter -Wno-sequence-point
+FLAGS = -isystem <path/to/seqan/here> -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp -lpthread -pthread -ggdb -Wno-unused-parameter -Wno-sequence-point
 ```
 3. Inside of the sequence_finder folder, run make
 ```
