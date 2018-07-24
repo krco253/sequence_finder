@@ -16,11 +16,13 @@ sequence_finder is a C++ project that utilizes the Seqan template library to fin
 ```
 git clone https://github.com/krco253/sequence_finder.git
 ```
-2. Compile with gcc, with the following flags:  g++ -isystem <path/to/seqan>
+2. Compile with gcc, with the following flags:  
+```
+g++ -isystem <path/to/seqan>
 -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp
 -lpthread -ggdb -o sequence_finder sequence_finder.cpp FragmentLibrary.cpp ContextFragment.cpp IndexedFragment.cpp -lrt 
 -Wno-unused-parameter -Wno-sequence-point
-
+```
 3. View sequence_finder help page like so: 
 ```
 ./sequence_finder -h
