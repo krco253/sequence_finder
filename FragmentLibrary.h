@@ -1,11 +1,14 @@
 /*---------------------------------
 | File: FragmentLibrary.h
 | Class: FragmentLibrary
+| Description: a library to store ContextFragments from the same genome
+| Author: Kelsey Cole
 -----------------------------------*/
 
 #include "ContextFragment.h" //ContextFragment
 #include <map> //map
 #include <algorithm> //sort
+
 class FragmentLibrary
 {
 	public:
@@ -13,27 +16,27 @@ class FragmentLibrary
 		FragmentLibrary();
 		FragmentLibrary(const FragmentLibrary &copy);
 		~FragmentLibrary();
-		//print list with all query sequences in red
+		//annotated_print(): print member variable context_substrings with all query sequences in red
 		void annotated_print();
-		//size() returns size of FragmentLibrary
+		//size(): return size of member variable context_substrings
 		unsigned size();
-		//Sort Vector by first index of each ContextFragment	
-		void sort_by_index();
 		//empty(): return true if FragmentLibrary is empty
 		bool empty();
-		//erase_substring: erase a substring from the FragmentLibrary
+		//erase_substring: erase a substring from member variable context_substrings
 		void erase_substring(std::pair<unsigned, unsigned> &fragment_key);
-
-		//consolidate_sequences: consolidate overlapping sequences
+		//consolidate_sequences: consolidate overlapping sequences 
 		void consolidate_sequences(Dna5String &context_sequence); 
-		//insert element 
+		//insert: insert element into member variable context_substrings
 		void insert(std::pair<unsigned,unsigned> &fragment_key, ContextFragment fragment_object); 
-		//return iterator to beginning of map
+		//begin(): return iterator to beginning of map
 		std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator begin();
 		//Overloaded Assignment Operators
 		FragmentLibrary operator=(const FragmentLibrary & other);
 		friend std::ostream& operator<<(std::ostream &os, const FragmentLibrary& sub_vec);
 		
 	private:
+		//store ContextFragments in a map with their coordinates as their key
 		std::map<std::pair<unsigned,unsigned>, ContextFragment> context_substrings;
+		//the name of the common reference genome
+		CharString reference_name;
 };

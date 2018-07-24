@@ -1,6 +1,8 @@
 /*---------------------------------
 | File: FragmentLibrary.cpp
 | Class: FragmentLibrary
+| Description: a library to store ContextFragments from the same genome
+| Author: Kelsey Cole
 -----------------------------------*/
 
 #include "FragmentLibrary.h"
@@ -9,22 +11,23 @@
 | Constructors and Destructors
 ------------------------------------------------*/
 
-FragmentLibrary::FragmentLibrary()
-{ 
-	
-}
+FragmentLibrary::FragmentLibrary(){ }
 
 FragmentLibrary::FragmentLibrary(const FragmentLibrary &copy)
 {
 	this->context_substrings= copy.context_substrings;
+	this->reference_name = copy.reference_name;
 }
 
 FragmentLibrary::~FragmentLibrary() { }
 
 
 /*---------------------------------------------
-| annotated_print
+| annotated_print()
+| Arguments: n/a
+| Output: prints whole library with all query sequences in red to the standard output
 ------------------------------------------------*/
+
 void FragmentLibrary::annotated_print()
 {
 	std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator it; 
@@ -34,8 +37,12 @@ void FragmentLibrary::annotated_print()
 	}
 }
 
+
 /*---------------------------------------------
-| empty()
+| empty
+| Arguments: n/a
+| Returns: boolean type (true if member variable context_substrings is empty) 
+| Description: return true if context_substrings is empty.
 ------------------------------------------------*/
 bool FragmentLibrary::empty() 
 {
@@ -47,7 +54,10 @@ bool FragmentLibrary::empty()
 		return false;	
 }
 /*---------------------------------------------
-| begin()
+| begin
+| Arguments: n/a
+| Returns: iterator at the beginning of member variable context_substrings
+| Description: return an iterator to the beginning of context_substrings
 ------------------------------------------------*/
 std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator FragmentLibrary::begin()
 {
@@ -55,6 +65,11 @@ std::map<std::pair<unsigned,unsigned>, ContextFragment>::iterator FragmentLibrar
 }
  /*---------------------------------------------
 | insert
+| Arguments: 
+| std::pair<unsigned, unsigned> fragment_key - coordinates on reference genome of fragment to insert 
+| into this FragmentLibrary
+| ContextFragment fragment_object - the ContextFragment to insert
+| Description: insert a new element into context_substrings
 ------------------------------------------------*/
 void FragmentLibrary::insert(std::pair<unsigned,unsigned> &fragment_key, ContextFragment fragment_object)
 {
@@ -62,8 +77,10 @@ void FragmentLibrary::insert(std::pair<unsigned,unsigned> &fragment_key, Context
 }
 /*---------------------------------------------
 | erase_substring
+| Arguments:
+| std::pair<unsigned,unsigned> &fragment_key - coordinates on reference genome of fragment to erase
+| Description: erase an element from context_substrings
 ------------------------------------------------*/
-
 void FragmentLibrary::erase_substring(std::pair<unsigned, unsigned> &fragment_key)
 {
 	(this->context_substrings).erase(fragment_key);
@@ -71,6 +88,9 @@ void FragmentLibrary::erase_substring(std::pair<unsigned, unsigned> &fragment_ke
 
 /*---------------------------------------------
 | consolidate_sequences
+| Arguments: 
+| context_sequence - reference genome 
+| Description: Combine overlapping sequences in member variable context_substrings
 ------------------------------------------------*/
 void FragmentLibrary::consolidate_sequences(Dna5String &context_sequence)
 {
@@ -124,7 +144,9 @@ void FragmentLibrary::consolidate_sequences(Dna5String &context_sequence)
 }
 
 /*----------------------------------------------
-|	size()
+| size()
+| Arguments: n/a
+| Returns: number of elements in member variable context_substrings
 ------------------------------------------------*/
 unsigned FragmentLibrary::size()
 {

@@ -2,28 +2,27 @@
 Name: sequence_finder
 Author: Kelsey Cole
 Purpose: Search for a sequence with fuzzy matching
-Usage: compile with flags g++ -isystem ~/devel/seqan/include 
+Usage: compile with the following flags -- g++ -isystem ~/devel/seqan/include 
 -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp
 -lpthread -ggdb -o sequence_finder sequence_finder.cpp -lrt 
 -Wno-unused-parameter -Wno-sequence-point
 TODO: -line up query column 
       -look for statistics for T content next to MoTeR relics
-      - correct consolidate_sequences
+      - output a BAM file (to be indexed and viewed in IGV)
+      - compatibility with fastq files (for Harrison)
       - output results in a way that can be pipelined (for Harrison)
-      - compare results with FH against the paper
-      - eventually extend to also search for 5' end of MoTER and consolidate whole results
 -----------------------------------------------------------*/
 
-#include <mutex> 
+#include <mutex> //for lockguard in delegate function
 #include <seqan/arg_parse.h> //parsing arguments from the command line
-#include <seqan/file.h>
+#include <seqan/file.h> 
 #include <seqan/seq_io.h> //reading input files/writing input files
-#include "FragmentLibrary.h"
-#include <aio.h>
+#include "FragmentLibrary.h" //to store and process results
+#include <aio.h> //asynchronous search
 
 using namespace seqan;
 
-#define ENABLE_SEQAN_DEBUG = 1
+#define ENABLE_SEQAN_DEBUG = 1 //enable debugging
 
 typedef Infix<Dna5String>::Type SString; //a type that stores subsequences of Dna5Strings
 typedef std::pair <SString, SString> SStringPair; //a pair of SStrings
@@ -69,20 +68,21 @@ int main(int argc, char const ** argv)
 	//Set Up ArgumentParser
 	ArgumentParser parser("sequence_finder");
 
+	//Add available command line options
 	addOption(parser, ArgParseOption("s", "haystack", "Provide path for sequence to search (.fasta)", ArgParseArgument::INPUT_FILE, "IN"));	
 	addOption(parser, ArgParseOption("n", "needle", "Provide path for sequence to search for (.fasta). Default is MoTER relic", ArgParseArgument::INPUT_FILE, "IN")); 
 	addOption(parser, ArgParseOption("t", "needle_tip", "Short string to look for typed out on command line. Default is MoTER relic", ArgParseArgument::STRING, "TEXT"));
 	addOption(parser, ArgParseOption("e", "errors", "Max number of errors allowed. Default is 2", ArgParseArgument::INTEGER, "INT")); 
 	addOption(parser, ArgParseOption("m", "minimum_match", "Minimum length of nucleotide sequence to consider a \"match\". Default is no minimum.", ArgParseArgument::INTEGER, "INT"));
-	//TODO
-//	addOption(parser, ArgParseOption("m", "moter_setting", "Choose from: \"begin\", \"end\", i
+	
 	//Parse command line arguments
 	ArgumentParser::ParseResult res = parse(parser, argc, argv);
 	
 	//if parsing was not successful exit with code 1 if there were errors
 	if (res != ArgumentParser::PARSE_OK)
 		return res == ArgumentParser::PARSE_ERROR;
-	//extract and store option value
+
+	//extract and store option values
 	int errors;
 	unsigned min_match;	
 	CharString haystackFileName, needleFileName;
@@ -109,10 +109,7 @@ int main(int argc, char const ** argv)
 		std::cout << "ERROR: " << e.what() << std::endl;
 	}
 	
-//	std::cout << lengthSum(h_ids) << std::endl;
-//	std::cout << "Position 0: " << value(h_seqs, 0) << '\n';
-//	std::cout << "Position 15: " <<value(h_seqs, 0) << '\n';
-		
+	
 	//declare containers to store needle file
 	CharString n_id;
 	Dna5String n_seq;
@@ -130,20 +127,22 @@ int main(int argc, char const ** argv)
 			std::cout << "ERROR: " << e.what() << std::endl;
 		}
 	}
-	//cout the sequence to make sure it read in correctly
-	//std::cout << "Position 0: " << value(h_seqs, 0) << '\n';
 	
 	//Default: Search for MoTER sequence
 
 	Dna5String whole_seq;
-	whole_seq = concat(h_seqs);
+	whole_seq = concat(h_seqs); //concatenate all records into a single sequence
 
+	//create Bidirectional FMIndex for the entire given sequence to search "in"
 	Index<Dna5String, BidirectionalIndex<FMIndex<> > > index(whole_seq);
 	
 
-	std::mutex mtx;
-	FragmentLibrary hits;
+	std::mutex mtx; //for lockguard in delegate function
+	FragmentLibrary hits; // to store and process hits
 	SString temp_sstring;
+
+	//a delegate function for processing hits
+	//to be passed to the function for Seqan's built-in Optimal Search Scheme algorithm
 	auto delegateParallel = [&hits, &mtx, &whole_seq](auto &iter, Dna5String const & needle, uint8_t errors)
 	{
 		std::lock_guard<std::mutex> lck(mtx);
@@ -205,6 +204,7 @@ int main(int argc, char const ** argv)
 		}
 		
 	}; 
+
 	//Search for hits
 
 	if((isSet(parser, "needle")) || (isSet(parser, "needle_tip"))) //if needle was specified
@@ -225,7 +225,7 @@ int main(int argc, char const ** argv)
 
 
 		//check for number of mismatches
-
+		//Then use Seqan's built-in Optimal Search Scheme algorithm
 		if (mismatches ==1) 
 		{
 			find<0,1>(delegateParallel, index, search_patterns, EditDistance());
@@ -254,37 +254,31 @@ int main(int argc, char const ** argv)
 		StringSet<Dna5String> extended_seqs;
 		find_MoTERs(essential_seqs, extended_seqs);
 		std::cout << "Searching for essential hits. . ." << std::endl;
+		//Seqan's built-in Optimal Search Scheme algorithm
 		find<0,1>(delegateParallel, index, essential_seqs, EditDistance());
-		std::cout << hits.size() << " essential hits found!" << std::endl;
 		std::cout << "Searching for extended hits. . ." << std::endl;
 		find<0,3>(delegateParallel, index, extended_seqs, EditDistance());
 	}
 	
 	//check if there were hits
-
+	//if there were no hits, print to standard out then exit successfully with return code 0
 	if (hits.empty()) 
 	{
-		std::cout << "There were no hits :(" << std::endl;	
+		std::cout << "There were no hits" << std::endl;	
 		return 0;
 	}
 	
-	//Consolidate hits
+	//Consolidate hits if they are overlapping
 
 	std::cout <<  "Consolidating hits . . ." << std::endl;
 	
-	hits.annotated_print();	
-
 	hits.consolidate_sequences(whole_seq);
 
-	//Prepare hits for printing	
-	
-	if(!isSet(parser, "minimum_match"))
-		min_match = 1;
-
-	//Print hits
-	std::cout << std::endl;
+	//Print hits to standard output, with query sequences in red
 
 	hits.annotated_print();	
+
+	//Print number of hits
 
 	std::cout << "There were " << hits.size() << " consolidated hits" << std::endl;
 

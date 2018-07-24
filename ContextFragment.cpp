@@ -1,7 +1,8 @@
-/*----------------------------------
+/*---------------------------------
 | File: ContextFragment.cpp
 | Class: ContextFragment
-| TODO: check over logic, line 116
+| Description: a container to store an IndexedFragment query sequence and its surrounding prefix/suffix
+| Author: Kelsey Cole
 -----------------------------------*/
 
 #include "ContextFragment.h"
@@ -31,6 +32,8 @@ ContextFragment::~ContextFragment() { }
 
 /*---------------------------------------------
 | clear()
+| Arguments: n/a
+| Description: "Reset" a ContextFragment to empty
 ------------------------------------------------*/
 void ContextFragment::clear()
 {
@@ -41,6 +44,8 @@ void ContextFragment::clear()
 }
 /*---------------------------------------------
 | isEmpty()
+| Arguments: n/a
+| Returns: boolean type (true if member variables prefix_seq, query_seq, and suffix_seq are all empty
 ------------------------------------------------*/
 bool ContextFragment::isEmpty()
 {
@@ -51,6 +56,8 @@ bool ContextFragment::isEmpty()
 }
 /*---------------------------------------------
 | flatten()
+| Arguments: n/a
+| Returns: the coordinates of this ContextFragment in the reference genome, beginning at the first coordinate of the prefix_seq and ending at the last coordinate of the suffix_seq
 ------------------------------------------------*/
 std::pair<unsigned, unsigned> ContextFragment::flatten()
 {
@@ -61,6 +68,10 @@ std::pair<unsigned, unsigned> ContextFragment::flatten()
 }
 /*---------------------------------------------
 | consolidate_frags()
+| Arguments: 
+| other - the ContextFragment to combine this ContextFragment with
+| sequence - the reference genome
+| Returns - the combined ContextFragment 
 ------------------------------------------------*/
 ContextFragment ContextFragment::consolidate_frags(const ContextFragment &other, Dna5String &sequence)
 {
@@ -108,6 +119,9 @@ ContextFragment ContextFragment::consolidate_frags(const ContextFragment &other,
 	
 /*---------------------------------------------
 | get_index
+| Arguments: 
+| which_index - which index to return (1 or 2)
+| which_fragment - which fragment to return (prefix - 0, query - 1, suffix - 2)
 ------------------------------------------------*/
 unsigned ContextFragment::get_index(unsigned which_index, unsigned which_fragment)
 {
@@ -128,10 +142,12 @@ unsigned ContextFragment::get_index(unsigned which_index, unsigned which_fragmen
 }
 /*---------------------------------------------
 | print_query (in red)
+| Arguments: n/a
+| Output: this ContextFragment, with the query sequence in red
 ------------------------------------------------*/
 void ContextFragment::print_query()
 {
-	std::cout << ((this->prefix_seq).indices).first << " " << this->prefix_seq << "\033[1;31m" <<  this->query_seq << "\033[0m" << this->suffix_seq << " " << ((this->suffix_seq).indices).second << std::endl;
+	std::cout << std::setw(8) << ((this->prefix_seq).indices).first << " " <<  this->prefix_seq << "\033[1;31m" <<  this->query_seq << "\033[0m" << this->suffix_seq << " " << ((this->suffix_seq).indices).second << std::endl;
 
 }
 

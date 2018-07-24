@@ -1,7 +1,10 @@
-/*---------------------------------------------
+/*---------------------------------
 | File: IndexedFragment.cpp
 | Class: IndexedFragment
-------------------------------------------------*/
+| Description: a container to store a Seqan defined "infix" sequence 
+| (which is a pointer to a subsequence on a reference genome) with its indices 
+| Author: Kelsey Cole
+-----------------------------------*/
 
 #include "IndexedFragment.h"
 
@@ -36,6 +39,9 @@ IndexedFragment::~IndexedFragment()
 
 /*---------------------------------------------
 | index_retrieve
+| Arguments: 
+| index_num - which index to retrieve (1 - first, 2 - second)
+| Returns: the requested index
 -----------------------------------------------*/
 unsigned IndexedFragment::index_retrieve(const unsigned &index_num) const
 {

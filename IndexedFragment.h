@@ -1,7 +1,9 @@
-/*---------------------------------------------
+/*---------------------------------
 | File: IndexedFragment.h
 | Class: IndexedFragment
-------------------------------------------------*/
+| Description: a container to store a Seqan defined "infix" sequence (which is a pointer to a subsequence on a reference genome) with its indices 
+| Author: Kelsey Cole
+-----------------------------------*/
 
 #include <utility> //pair
 #include <iostream> //cout 
@@ -21,8 +23,8 @@ typedef Infix<Dna5String>::Type SString; //a type that creates pointers to subse
 
 class IndexedFragment
 {
-	friend class ContextFragment;
-	friend class SubstringVector;
+	friend class ContextFragment; //this class is inherently designed to be used for ContextFragment and FragmentLibrary
+	friend class FragmentLibrary;
 	public:
 		//Constructors and Destructors
 		IndexedFragment();
@@ -40,6 +42,6 @@ class IndexedFragment
 		friend bool operator==(const IndexedFragment &first, const IndexedFragment &last);
 	
 	private:
-		std::pair <unsigned,unsigned> indices;
-		SString fragment;
+		std::pair <unsigned,unsigned> indices; //indices of the sequence
+		SString fragment; //the sequence itself
 };

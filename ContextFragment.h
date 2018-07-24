@@ -1,13 +1,15 @@
 /*---------------------------------
 | File: ContextFragment.h
 | Class: ContextFragment
+| Description: a container to store an IndexedFragment query sequence and its surrounding prefix/suffix
+| Author: Kelsey Cole
 -----------------------------------*/
 
 #include "IndexedFragment.h"
 
 class ContextFragment
 {
-	friend class SubstringVector;
+	friend class FragmentLibrary; //this class was inherently designed to be used for FragmentLibrary
 	public:
 		//Constructors and Destructors
 		ContextFragment();
@@ -15,17 +17,17 @@ class ContextFragment
 		ContextFragment(const ContextFragment &copy);
 		~ContextFragment();
 
-		//print the query sequence in red
+		//print_query(): print this ContextFragment, with member variable query_seq in red
 		void print_query();
-		//clear out contextfragment
+		//clear(): clear out this ContextFragment (set all member variables to empty)
 		void clear();
-		//check if a contextfragment is empty
+		//isEmpty(): check if this ContextFragment is empty
 		bool isEmpty();
-		//"flatten" the ContextFragment into one IndexedFragment
+		//flatten(): returned the "flattened" coordinates of this ContextFragment 
 		std::pair<unsigned,unsigned> flatten();
-		//combine fragments, conserving the query sequences
+		//consolidate_frags: combine fragments, conserving the query sequences
 		ContextFragment consolidate_frags(const ContextFragment &other, Dna5String &sequence);
-		//return the requested index of the query_seq
+		//get_index: return the requested index of the query_seq
 		unsigned get_index(unsigned which_index, unsigned which_fragment);
 		
 		//Overloaded Operators
