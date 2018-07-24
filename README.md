@@ -13,13 +13,13 @@ sequence_finder is a C++ project that utilizes the Seqan template library to fin
 ```
 sudo apt get make
 ```
-2### Installing
+### Installing
 
 1. Download this repository:
 ```
 git clone https://github.com/krco253/sequence_finder.git
 ```
-2. Navigate to sequence_finder directory and edit the flags in the makefile to reflect the location of Seqan on your machine:  
+2. Navigate to sequence_finder directory and edit the FLAGS macro in the makefile to reflect the location of Seqan on your machine:  
 ```
 FLAGS = -isystem <path/to/seqan> -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic -fopenmp -lpthread -pthread -ggdb -Wno-unused-parameter -Wno-sequence-point
 ```
