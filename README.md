@@ -47,6 +47,7 @@ sequence_finder -s <path/to/your/FASTA/file>
 sequence_finder -s <path/to/your/FASTA/file> -t <"your DNA string"> -e <max number of errors>
 ```
 This program only supports up to 4 errors.
+
 4. For other commands, check out the help page.
 
 ## Authors
