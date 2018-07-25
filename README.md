@@ -27,27 +27,31 @@ FLAGS = -isystem <path/to/seqan/here> -std=c++14 -O3 -DNDEBUG -W -Wall -pedantic
 ```
 make
 ```
-4. View sequence_finder help page like so: 
+4. To be able to run sequence_finder from any directory in your machine, navigate to the home directory, open .profile with the text editor of your choice, and add the following line to the end of the file:
 ```
-./sequence_finder -h
+export "PATH=~/sequence_finder:$PATH"
+```
+5. Restart your machine. View sequence_finder help page like so: 
+```
+sequence_finder -h
 ```
 
 ### Usage
 1. This program must be given the path to a .fasta file to search in order to work.
 2. By default, this program looks for MoTeR relics and the surrounding sequence. To use the program in its default state: 
 ```
-./sequence_finder -s <path/to/your/FASTA/file>
+sequence_finder -s <path/to/your/FASTA/file>
 ```
 3. To use this program to search for a short string: 
 ```
-./sequence_finder -s <path/to/your/FASTA/file> -t <"your DNA string"> -e <max number of errors>
+sequence_finder -s <path/to/your/FASTA/file> -t <"your DNA string"> -e <max number of errors>
 ```
 This program only supports up to 4 errors.
 4. For other commands, check out the help page.
 
 ## Authors
 
-* **Kelsey Cole** 
+* Kelsey Cole 
 
 
 ## Acknowledgments
