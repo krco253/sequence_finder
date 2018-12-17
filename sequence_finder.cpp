@@ -10,7 +10,6 @@ TODO: -line up query column
       -look for statistics for T content next to MoTeR relics
       - output a BAM file (to be indexed and viewed in IGV)
       - compatibility with fastq files (for Harrison)
-      - output results in a way that can be pipelined (for Harrison)
 -----------------------------------------------------------*/
 
 #include <mutex> //for lockguard in delegate function
@@ -62,12 +61,13 @@ int main(int argc, char const ** argv)
 	ArgumentParser parser("sequence_finder");
 
 	//Add available command line options
-	addOption(parser, ArgParseOption("s", "haystack", "Provide path for sequence to search (.fasta)", ArgParseArgument::INPUT_FILE, "IN"));	
+	addOption(parser, ArgParseOption("s", "haystack", "Provide path for sequence to search (.fasta or .fastq; .fasta is default)", ArgParseArgument::INPUT_FILE, "IN"));	
 	addOption(parser, ArgParseOption("n", "needle", "Provide path for sequence to search for (.fasta). Default is MoTER relic", ArgParseArgument::INPUT_FILE, "IN")); 
 	addOption(parser, ArgParseOption("t", "needle_tip", "Short string to look for typed out on command line. Default is MoTER relic", ArgParseArgument::STRING, "TEXT"));
 	addOption(parser, ArgParseOption("e", "errors", "Max number of errors allowed. Default is 2", ArgParseArgument::INTEGER, "INT")); 
 	addOption(parser, ArgParseOption("m", "minimum_match", "Minimum length of nucleotide sequence to consider a \"match\". Default is no minimum.", ArgParseArgument::INTEGER, "INT"));
-	
+	addOption(parser, ArgParseOption("f", "file_type", "Indicate haystack file type; 0 for .fasta or 1 for .fastq; .fasta is default", ArgParseArgument::INTEGER, "INT"));
+
 	//Parse command line arguments
 	ArgumentParser::ParseResult res = parse(parser, argc, argv);
 	
@@ -81,28 +81,63 @@ int main(int argc, char const ** argv)
 	CharString haystackFileName, needleFileName;
 	Dna5String query;
 	
+	int f_type = 0;
+	
 	getOptionValue(haystackFileName, parser, "haystack");
 	getOptionValue(needleFileName, parser, "needle");
 	getOptionValue(query, parser, "needle_tip");
 	getOptionValue(errors, parser, "errors");
 	getOptionValue(min_match, parser, "minimum_match");
-	
+	getOptionValue(f_type,parser,"file_type");
+
 	//Open input file
 	StringSet<CharString> h_ids;
 	StringSet<Dna5String> h_seqs;
+	StringSet<CharString> h_quals;
 		
-	SeqFileIn seqFileIn1(toCString(haystackFileName));
-	//Reads records at the same time
-	try
+	SeqFileIn seqFileIn1;
+	if(!open(seqFileIn1, toCString(haystackFileName)))
 	{
-		readRecords(h_ids, h_seqs, seqFileIn1);
-	}
-	catch (Exception const &e)
-	{
-		std::cout << "ERROR: " << e.what() << std::endl;
+		std::cerr << "ERROR: could not open file \n";
+		return 1;
 	}
 	
+	if (f_type == 0) //if the input file is a fastq file
+	{
+		std::cout << "Reading in file . . ." << std::endl;
+		//Reads records at the same time
+		try
+		{
+			readRecords(h_ids, h_seqs, seqFileIn1);
+		}
+		catch (Exception const &e)
+		{
+			std::cout << "ERROR: " << e.what() << std::endl;
+			return 1;
+		}	
+	}
+	else
+	{
+		std::cout << "Reading in file . . ." << std::endl;
+		
+		try
+		{
+			readRecords(h_ids, h_seqs, h_quals, seqFileIn1);
+		}
+		catch (Exception const &e)
+		{
+			std::cout << "ERROR: " << e.what() << std::endl;
+			return 1;
+		}
+	}
 	
+
+/*	for (unsigned i = 0; i < length(h_seqs); i++)
+	{
+		std::cout << " " << h_seqs[i] << " ";
+	}
+	
+	return 0;*/
 	//declare containers to store needle file
 	CharString n_id;
 	Dna5String n_seq;
@@ -121,7 +156,7 @@ int main(int argc, char const ** argv)
 		}
 	}
 	
-	//Default: Search for MoTER sequence
+	//Default: Search for MoTeR relic sequence
 
 	Dna5String whole_seq;
 	whole_seq = concat(h_seqs); //concatenate all records into a single sequence
